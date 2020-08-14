@@ -5,8 +5,32 @@
         <meta name="robots" content="noindex, nofollow">
         <title>Brutal Jukebox</title>
 		<script src="popup.js"></script>
+        <link rel="stylesheet" href="popup.css">
     </head>
     <body>
-        
+        <h1>Brutal Jukebox 🎧</h1>
+        <div>
+            <h2>Upcoming tweet</h2>
+            <div id="upcomingTweet"></div>
+            <button id="cancelTweet">Cancel</button>
+        </div>
+        <div>
+            <h2>Tweets from this session</h2>
+            <ul id="sessionTweet">
+            </ul>
+        </div>
+        <div>
+            <h2>Tweet custom youtube song</h2>
+            <input id="customSong" placeholder="Youtube url"></input>
+            <button id="customSongSubmit">Tweet !</button>
+        </div>
+        <div>
+            <h2>Disable jukebox 😴</h2>
+            <label class="switch">
+                <input type="checkbox" id="extensionState" checked>
+                <span class="slider round"></span>
+            </label>
+            <span>Activé</span>
+        </div>
     </body>
 </html>

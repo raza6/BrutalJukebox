@@ -1,13 +1,20 @@
-chrome.runtime.onInstalled.addListener(function() {
-	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-		if (tab.url.includes('https://music.youtube.com/watch')) {
-			mainJukebox(tabId, changeInfo, tab);
-		}
-	});
-});
-
+let extensionState = true;
 let playedMusic = [];
 let lastValidTab;
+
+chrome.runtime.onInstalled.addListener(function() {
+	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+		if (extensionState && tab.url.includes('https://music.youtube.com/watch')) {
+            mainJukebox(tabId, changeInfo, tab);
+		}
+	});
+    
+    chrome.storage.local.onChanged.addListener(function(stored) {
+        if(stored.brutalJukeboxState) {
+            extensionState = stored.brutalJukeboxState.newValue;
+        }
+    });
+});
 
 function mainJukebox(tabId, changeInfo, tab) {
 	console.log('😎', changeInfo, tab);
