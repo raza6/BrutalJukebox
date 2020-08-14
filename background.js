@@ -12,6 +12,11 @@ chrome.runtime.onInstalled.addListener(function() {
     chrome.storage.local.onChanged.addListener(function(stored) {
         if(stored.brutalJukeboxState) {
             extensionState = stored.brutalJukeboxState.newValue;
+            if (extensionState) {
+                chrome.browserAction.setIcon({path: './images/bj32.png'})
+            } else {
+                chrome.browserAction.setIcon({path: './images/bj32wb.png'})
+            }
         }
     });
 });
