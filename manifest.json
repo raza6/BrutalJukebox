@@ -1,0 +1,22 @@
+{
+	"name": "Brutal Jukebox",
+	"version": "0.1",
+	"description": "Tweet your music !",
+	"author": "@raza6",
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"permissions": ["tabs", "http://*/", "https://*/"],
+	"icons": {
+		"16": "images/bj16.png",
+		"32": "images/bj32.png",
+		"48": "images/bj48.png",
+		"128": "images/bj128.png"
+    },
+	"browser_action": {
+		"default_icon": "images/bj128.png",
+		"default_popup": "popup.html",
+	},
+	"manifest_version": 2
+}
