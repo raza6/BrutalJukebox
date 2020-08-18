@@ -2,6 +2,10 @@ body {
     width: 280px;
 }
 
+h2 {
+	margin: 5px 0;
+}
+
 .switch {
     position: relative;
     display: inline-block;
@@ -63,4 +67,22 @@ input:checked + .slider:before {
 
 .switch + span {
     vertical-align: middle;
+}
+
+#upcomingTweet {
+	padding: 4px;
+	margin-bottom: 5px;
+	border-radius: 3px;
+	border: 0.5px solid grey;
+}
+
+#currentSongLink {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	display: block;
+	overflow: hidden;
+}
+
+#cancelTweet {
+	cursor: pointer;
 }

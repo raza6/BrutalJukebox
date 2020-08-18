@@ -1,6 +1,6 @@
 let extensionState = true;
 let playedMusic = [];
-let lastValidTab;
+let lastValidSong;
 
 chrome.runtime.onInstalled.addListener(function() {
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
@@ -19,6 +19,12 @@ chrome.runtime.onInstalled.addListener(function() {
             }
         }
     });
+	
+	chrome.runtime.onMessage.addListener(msg => {
+		if (msg.event === 'requestSong') {
+			chrome.runtime.sendMessage({event: 'newSong', song: lastValidSong});
+		}
+	});
 });
 
 function mainJukebox(tabId, changeInfo, tab) {
@@ -27,16 +33,26 @@ function mainJukebox(tabId, changeInfo, tab) {
 	if (audible) {
 		if (!playedMusic.includes(title) && title !== 'YouTube Music') {
 			playedMusic.push(title);
-			if (lastValidTab !== undefined) {
-				postTweet(lastValidTab);
+			
+			if (lastValidSong !== undefined) {
+				postTweet(lastValidSong);
 			}
-			lastValidTab = {tabId, ...tab};
+			
+			let ytURL = tab.url;
+			ytURL = ytURL.replace('music', 'www');
+			ytURL = ytURL.match(/(.*)&list/)[1];
+			fetch(`https://www.youtube.com/oembed?url=${ytURL}&format=json`)
+			.then(response => response.json())
+			.then(ytData => {
+				lastValidSong = {...ytData, url: ytURL};
+				console.log(ytURL);
+				chrome.runtime.sendMessage({event: 'newSong', song: lastValidSong});
+			});
 		}
 		console.log(playedMusic);
 	}
 }
 
-function postTweet(tabTweet) {
-	console.log('Tweet 🐤', tabTweet);
-	chrome.tabs.executeScript(tabTweet.tabId, {code: 'return document'}, () => console.log);
+function postTweet(song) {
+	console.log('Tweet 🐤', song);
 }
