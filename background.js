@@ -53,7 +53,9 @@ chrome.runtime.onInstalled.addListener(() => {
 
     chrome.runtime.onMessage.addListener((msg) => {
         if (msg.event === 'requestSong') {
-            chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
+            if (lastValidSong) {
+                chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
+            }
         }
     });
 });

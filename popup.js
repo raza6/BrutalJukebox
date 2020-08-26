@@ -19,6 +19,7 @@ window.onload = () => {
     chrome.runtime.onMessage.addListener((msg) => {
         if (msg.event === 'newSong') {
             const { author_name, title, url } = msg.song;
+            document.getElementById('upcomingTweet').removeAttribute('nosong');
             document.getElementById('currentSongTitle').innerText = title;
             document.getElementById('currentSongChannel').innerText = author_name;
             document.getElementById('currentSongLink').innerText = url;
