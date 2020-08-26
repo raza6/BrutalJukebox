@@ -1,9 +1,12 @@
 let extensionState = true;
 const playedMusic = [];
+const tweetedSongs = [];
 let lastValidSong;
 
 function postTweet(song) {
     console.log('Tweet 🐤', song);
+    tweetedSongs.push(song);
+    chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
 }
 
 function mainJukebox(tabId, changeInfo, tab) {
@@ -25,7 +28,6 @@ function mainJukebox(tabId, changeInfo, tab) {
                 .then((response) => response.json())
                 .then((ytData) => {
                     lastValidSong = { ...ytData, url: ytURL };
-                    console.log(ytURL);
                     chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
                 });
         }
@@ -55,6 +57,7 @@ chrome.runtime.onInstalled.addListener(() => {
         if (msg.event === 'requestSong') {
             if (lastValidSong) {
                 chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
+                chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
             }
         }
     });

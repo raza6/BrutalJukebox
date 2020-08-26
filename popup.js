@@ -24,7 +24,17 @@ window.onload = () => {
             document.getElementById('currentSongChannel').innerText = author_name;
             document.getElementById('currentSongLink').innerText = url;
             document.getElementById('currentSongLink').href = url;
+            
+        } else if (msg.event === 'tweetSong') {
+            const listHead = document.getElementById('sessionTweet');
+            listHead.innerHTML = '';
+            for (song of msg.songs.reverse().slice(0, 10)) {
+                const el = document.createElement('li');
+                el.innerText = `${song.title} by ${song.author_name}`;
+                listHead.appendChild(el);
+            }
         }
     });
+
     chrome.runtime.sendMessage({ event: 'requestSong' });
 };
