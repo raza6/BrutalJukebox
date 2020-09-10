@@ -1,0 +1,14 @@
+{
+  "name": "brutal_jukebox_server",
+  "version": "1.0.0",
+  "description": "Node server associated with the brutal jukebox extension which purpose is to post tweets",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "raza6",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
