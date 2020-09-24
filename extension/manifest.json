@@ -23,6 +23,5 @@
 		"default_icon": "images/bj32.png",
 		"default_popup": "popup.html"
 	},
-    "options_page": "options.html",
 	"manifest_version": 2
 }

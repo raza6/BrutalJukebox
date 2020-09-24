@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 window.onload = () => {
+	// Button to enable / disable the extension
     const extensionState = document.getElementById('extensionState');
     extensionState.addEventListener('change', () => {
         // eslint-disable-next-line quote-props
@@ -17,15 +18,14 @@ window.onload = () => {
     });
 
     chrome.runtime.onMessage.addListener((msg) => {
-        if (msg.event === 'newSong') {
+		if (msg.event === 'newSong') { // Detect if a new song is being played
             const { author_name, title, url } = msg.song;
             document.getElementById('upcomingTweet').removeAttribute('nosong');
             document.getElementById('currentSongTitle').innerText = title;
             document.getElementById('currentSongChannel').innerText = author_name;
             document.getElementById('currentSongLink').innerText = url;
             document.getElementById('currentSongLink').href = url;
-            
-        } else if (msg.event === 'tweetSong') {
+        } else if (msg.event === 'tweetSong') { // Detect if song have been tweeted
             const listHead = document.getElementById('sessionTweet');
             listHead.innerHTML = '';
             for (song of msg.songs.reverse().slice(0, 10)) {
