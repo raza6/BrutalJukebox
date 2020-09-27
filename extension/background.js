@@ -6,13 +6,24 @@ let lastValidSong;
 
 // Make the call to the local server to post a tweet
 function postTweet(song) {
-  console.log('Tweet 🐤', song);
+  const tweet = `🎵 Bobby is listening to ${song.title} on ${song.url} 🎵`;
+  console.log('Tweet 🐤 :', tweet);
+  fetch('http://localhost:3000/newsong', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ tweet }),
+  }).then((response) => response.text()).then((text) => console.log(text));
+
   tweetedSongs.push(song);
   chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
 }
 
+// Determine if an open is ytbMusic and parse it if its a new song
 function mainJukebox(tabId, changeInfo, tab) {
-  console.log('😎', changeInfo, tab);
+  console.log('New tab detected 😎', changeInfo, tab);
   const { audible, title } = tab;
   if (audible) {
     if (!playedMusic.includes(title) && title !== 'YouTube Music') {
@@ -33,7 +44,7 @@ function mainJukebox(tabId, changeInfo, tab) {
           chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
         });
     }
-    console.log(playedMusic);
+    console.log('Music played so far', playedMusic);
   }
 }
 
