@@ -1,15 +1,14 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const Twit = require('twit');
+const fs = require('fs');
+
+const twitcred = fs.readFileSync('twitcred.json');
+const twitcredjson = JSON.parse(twitcred);
 
 const app = express();
 app.use(bodyParser.json());
-const twit = new Twit({
-  consumer_key: 'XQvvRtPgBhZobgV8FSKPgPG7k',
-  consumer_secret: '4telrJap4rKaqNLXhgpBb1cevnIOEyb05aqWvBxAi4LhQpZUlF',
-  access_token: '1299110813190574081-DxaiLJ2qGsSpAlMwfWN0Icxn1CzIYb',
-  access_token_secret: 'idjILgzTTcJuR5eGTjFmZp46XUo94th1T65i3OPM3mxUC',
-});
+const twit = new Twit(twitcredjson);
 
 // POST /newsong -> post a tweet
 app.post('/newsong', (req, res) => {
