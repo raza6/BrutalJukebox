@@ -2,19 +2,29 @@
 /* eslint-disable no-undef */
 window.onload = () => {
   // Button to enable / disable the extension
-  const extensionState = document.getElementById('extensionState');
-  extensionState.addEventListener('change', () => {
+  const extensionStateSlider = document.getElementById('extensionState');
+
+  let extensionState = true;
+  chrome.storage.local.get('brutalJukeboxState', (res) => {
+    extensionState = res.brutalJukeboxState;
+    extensionStateSlider.checked = extensionState;
+    extensionStateSlider.dispatchEvent(new Event('change'));
+  });
+
+  extensionStateSlider.addEventListener('change', () => {
     // eslint-disable-next-line quote-props
-    chrome.storage.local.set({ 'brutalJukeboxState': extensionState.checked });
+    chrome.storage.local.set({ 'brutalJukeboxState': extensionStateSlider.checked });
     const wrap = document.getElementById('extensionStateWrapper');
     const title = wrap.querySelector('h2');
     const label = wrap.querySelector('#extensionStateWrapper > span');
-    if (extensionState.checked) {
+    extensionState = extensionStateSlider.checked;
+    if (extensionStateSlider.checked) {
       title.innerText = 'Disable extension';
       label.innerText = 'Enabled 🤩';
     } else {
       title.innerText = 'Enable extension';
       label.innerText = 'Disabled 😴';
+      document.getElementById('upcomingTweet').setAttribute('nosong', 'nosong');
     }
   });
 

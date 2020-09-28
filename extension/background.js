@@ -7,7 +7,7 @@ let cancelNextTweet = false;
 
 // Make the call to the local server to post a tweet
 function postTweet(song) {
-  const tweet = `🎵 Bobby is listening to ${song.title} on ${song.url} 🎵`;
+  const tweet = `🎵 Bobby is listening to ${song.title} by ${song.author_name} on ${song.url} 🎵`;
   console.log('Tweet 🐤 :', tweet);
   fetch('http://localhost:3000/newsong', {
     method: 'POST',
@@ -75,7 +75,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
   // Detect if popup page need update
   chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.event === 'requestSong') {
+    if (msg.event === 'requestSong' && extensionState) {
       if (lastValidSong) {
         chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong, cancelNextTweet });
         chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
