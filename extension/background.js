@@ -11,7 +11,7 @@ function postTweet(song) {
   fetch('http://localhost:3000/newsong', {
     method: 'POST',
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ tweet }),
@@ -75,6 +75,13 @@ chrome.runtime.onInstalled.addListener(() => {
         chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
         chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
       }
+    }
+  });
+
+  // Custom tweet
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.event === 'customTweetSong') {
+      postTweet(msg.song);
     }
   });
 });

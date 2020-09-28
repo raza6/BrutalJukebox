@@ -18,6 +18,26 @@ window.onload = () => {
     }
   });
 
+  const customSongIpt = document.getElementById('customSong');
+  const customSongButton = document.getElementById('customSongSubmit');
+  let customUrl = '';
+  customSongIpt.addEventListener('input', (e) => {
+    if (e.target.value && /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=\w+$/.test(e.target.value)) {
+      customSongButton.removeAttribute('disabled');
+      customUrl = e.target.value;
+    } else {
+      customUrl = '';
+      customSongButton.setAttribute('disabled', 'disabled');
+    }
+  });
+  customSongButton.addEventListener('click', () => {
+    fetch(`https://www.youtube.com/oembed?url=${customUrl}&format=json`)
+      .then((response) => response.json())
+      .then((ytData) => {
+        chrome.runtime.sendMessage({ event: 'customTweetSong', song: { ...ytData, url: customUrl } });
+      });
+  });
+
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.event === 'newSong') { // Detect if a new song is being played
       const { author_name, title, url } = msg.song;
