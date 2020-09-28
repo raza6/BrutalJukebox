@@ -18,6 +18,13 @@ window.onload = () => {
     }
   });
 
+  const cancelButton = document.getElementById('cancelTweet');
+  cancelButton.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ event: 'cancelTweet' });
+    cancelButton.innerText = 'Cancelled';
+    cancelButton.setAttribute('disabled', 'disabled');
+  });
+
   const customSongIpt = document.getElementById('customSong');
   const customSongButton = document.getElementById('customSongSubmit');
   let customUrl = '';
@@ -46,6 +53,13 @@ window.onload = () => {
       document.getElementById('currentSongChannel').innerText = author_name;
       document.getElementById('currentSongLink').innerText = url;
       document.getElementById('currentSongLink').href = url;
+      if (msg.cancelNextTweet) {
+        cancelButton.innerText = 'Cancelled';
+        cancelButton.setAttribute('disabled', 'disabled');
+      } else {
+        cancelButton.innerText = 'Cancel';
+        cancelButton.removeAttribute('disabled');
+      }
     } else if (msg.event === 'tweetSong') { // Detect if song have been tweeted
       const listHead = document.getElementById('sessionTweet');
       listHead.innerHTML = '';

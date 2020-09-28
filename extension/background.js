@@ -3,6 +3,7 @@ let extensionState = true;
 const playedMusic = [];
 const tweetedSongs = [];
 let lastValidSong;
+let cancelNextTweet = false;
 
 // Make the call to the local server to post a tweet
 function postTweet(song) {
@@ -30,7 +31,11 @@ function mainJukebox(tabId, changeInfo, tab) {
       playedMusic.push(title);
 
       if (lastValidSong !== undefined) {
-        postTweet(lastValidSong);
+        if (cancelNextTweet) {
+          cancelNextTweet = false;
+        } else {
+          postTweet(lastValidSong);
+        }
       }
 
       let ytURL = tab.url;
@@ -41,7 +46,7 @@ function mainJukebox(tabId, changeInfo, tab) {
         .then((response) => response.json())
         .then((ytData) => {
           lastValidSong = { ...ytData, url: ytURL };
-          chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
+          chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong, cancelNextTweet });
         });
     }
     console.log('Music played so far', playedMusic);
@@ -72,7 +77,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.event === 'requestSong') {
       if (lastValidSong) {
-        chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong });
+        chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong, cancelNextTweet });
         chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
       }
     }
@@ -82,6 +87,13 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.event === 'customTweetSong') {
       postTweet(msg.song);
+    }
+  });
+
+  // Cancel next tweet
+  chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.event === 'cancelTweet') {
+      cancelNextTweet = true;
     }
   });
 });
