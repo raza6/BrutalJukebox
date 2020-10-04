@@ -30,6 +30,8 @@ You can disable the whole extension with the slider at the bottom. This setting 
 
 If you want to tweet a song that is not available on YouTube Music, copy/paste a YouTube url in the custom song field.
 
+The extension is not made to work under incognito mode.
+
 ## Acknowledgment
 
 This project uses [express](http://expressjs.com) and [twit](https://github.com/ttezel/twit).

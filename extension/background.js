@@ -5,6 +5,8 @@ const tweetedSongs = [];
 let lastValidSong;
 let cancelNextTweet = false;
 
+console.log('BrutalJukebox started');
+
 // Make the call to the local server to post a tweet
 function postTweet(song) {
   const tweet = `🎵 Bobby is listening to ${song.title} by ${song.author_name} on ${song.url} 🎵`;
@@ -53,7 +55,7 @@ function mainJukebox(tabId, changeInfo, tab) {
   }
 }
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onStartup.addListener(() => {
   // Detect new music played in youtubeMusic tab
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (extensionState && tab.url.includes('https://music.youtube.com/watch')) {
