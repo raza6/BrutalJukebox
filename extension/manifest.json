@@ -3,6 +3,7 @@
 	"version": "0.1",
 	"description": "Tweet your music !",
 	"author": "@raza6",
+	"options_page": "options.html",
 	"background": {
 		"scripts": ["background.js"],
 		"persistent": false

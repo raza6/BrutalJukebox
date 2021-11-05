@@ -25,11 +25,11 @@ function postTweet(song) {
 }
 
 // Determine if an open is ytbMusic and parse it if its a new song
-function mainJukebox(tabId, changeInfo, tab) {
+function mainJukebox(_, changeInfo, tab) {
   console.log('New tab detected 😎', changeInfo, tab);
   const { audible, title } = tab;
   if (audible) {
-    if (!playedMusic.includes(title) && title !== 'YouTube Music') {
+    if (!playedMusic.includes(title) && title !== 'YouTube Music') {
       playedMusic.push(title);
 
       if (lastValidSong !== undefined) {
@@ -47,7 +47,7 @@ function mainJukebox(tabId, changeInfo, tab) {
       fetch(`https://www.youtube.com/oembed?url=${ytURL}&format=json`)
         .then((response) => response.json())
         .then((ytData) => {
-          lastValidSong = { ...ytData, url: ytURL };
+          lastValidSong = { ...ytData, author_name: ytData.author_name.replace(' - Topic', ''), url: ytURL };
           chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong, cancelNextTweet });
         });
     }
@@ -55,47 +55,45 @@ function mainJukebox(tabId, changeInfo, tab) {
   }
 }
 
-chrome.runtime.onStartup.addListener(() => {
-  // Detect new music played in youtubeMusic tab
-  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (extensionState && tab.url.includes('https://music.youtube.com/watch')) {
-      mainJukebox(tabId, changeInfo, tab);
-    }
-  });
+// Detect new music played in youtubeMusic tab
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (extensionState && tab.url.includes('https://music.youtube.com/watch')) {
+    mainJukebox(tabId, changeInfo, tab);
+  }
+});
 
-  // Detect if extension is enabled / disabled
-  chrome.storage.local.onChanged.addListener((stored) => {
-    if (stored.brutalJukeboxState) {
-      extensionState = stored.brutalJukeboxState.newValue;
-      if (extensionState) {
-        chrome.browserAction.setIcon({ path: './images/bj32.png' });
-      } else {
-        chrome.browserAction.setIcon({ path: './images/bj32wb.png' });
-      }
+// Detect if extension is enabled / disabled
+chrome.storage.local.onChanged.addListener((stored) => {
+  if (stored.brutalJukeboxState) {
+    extensionState = stored.brutalJukeboxState.newValue;
+    if (extensionState) {
+      chrome.browserAction.setIcon({ path: './images/bj32.png' });
+    } else {
+      chrome.browserAction.setIcon({ path: './images/bj32wb.png' });
     }
-  });
+  }
+});
 
-  // Detect if popup page need update
-  chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.event === 'requestSong' && extensionState) {
-      if (lastValidSong) {
-        chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong, cancelNextTweet });
-        chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
-      }
+// Detect if popup page need update
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.event === 'requestSong' && extensionState) {
+    if (lastValidSong) {
+      chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong, cancelNextTweet });
+      chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
     }
-  });
+  }
+});
 
-  // Custom tweet
-  chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.event === 'customTweetSong') {
-      postTweet(msg.song);
-    }
-  });
+// Custom tweet
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.event === 'customTweetSong') {
+    postTweet(msg.song);
+  }
+});
 
-  // Cancel next tweet
-  chrome.runtime.onMessage.addListener((msg) => {
-    if (msg.event === 'cancelTweet') {
-      cancelNextTweet = true;
-    }
-  });
+// Cancel next tweet
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.event === 'cancelTweet') {
+    cancelNextTweet = true;
+  }
 });
