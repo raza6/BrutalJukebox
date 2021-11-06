@@ -15,7 +15,7 @@ app.post('/newsong', (req, res) => {
   twit.post('statuses/update', { status: req.body.tweet }, (err) => {
     if (err) {
       console.log(`Tweet failed ❌ (${req.body.tweet.slice(25, 50)}...)`);
-      res.send('Tweet failed with', req.body.tweet);
+      res.send(`Tweet failed with ${req.body.tweet}`);
     } else {
       console.log(`Tweet success ✔ (${req.body.tweet.slice(25, 50)}...)`);
       res.send('Tweet success');

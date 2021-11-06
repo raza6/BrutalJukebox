@@ -35,6 +35,11 @@ window.onload = () => {
     cancelButton.setAttribute('disabled', 'disabled');
   });
 
+  const tweetNowButton = document.getElementById('tweetNow');
+  tweetNowButton.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ event: 'tweetNow' });
+  });
+
   const customSongIpt = document.getElementById('customSong');
   const customSongButton = document.getElementById('customSongSubmit');
   let customUrl = '';
@@ -53,6 +58,11 @@ window.onload = () => {
       .then((ytData) => {
         chrome.runtime.sendMessage({ event: 'customTweetSong', song: { ...ytData, url: customUrl } });
       });
+  });
+
+  const helperStateButton = document.getElementById('helperStateButton');
+  helperStateButton.addEventListener('click', () => {
+    chrome.runtime.sendMessage({ event: 'checkHelper' });
   });
 
   function retryTweetSong(url) {
@@ -89,8 +99,16 @@ window.onload = () => {
         }
         listHead.appendChild(el);
       }
+    } else if (msg.event === 'helperState') { // Detect helper state
+      const helperStateText = document.getElementById('helperState');
+      if (msg.helperStatus) {
+        helperStateText.innerText = 'Up 😀';
+      } else {
+        helperStateText.innerText = 'Down 😓';
+      }
     }
   });
 
   chrome.runtime.sendMessage({ event: 'requestSong' });
+  chrome.runtime.sendMessage({ event: 'checkHelper' });
 };

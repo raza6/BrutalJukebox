@@ -116,13 +116,33 @@ chrome.runtime.onMessage.addListener((msg) => {
 // Retry tweet
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.event === 'retryTweetSong') {
-    console.log(msg);
-    console.log([...tweetedSongs]);
     const retrySong = tweetedSongs.splice(
       tweetedSongs.findIndex((song) => song.url === msg.songUrl),
       1,
     )[0];
-    console.log(retrySong, [...tweetedSongs]);
     postTweet(retrySong);
+  }
+});
+
+// Check local server status
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.event === 'checkHelper') {
+    fetch('http://localhost:3000/ping', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          chrome.runtime.sendMessage({ event: 'helperState', helperStatus: true });
+        } else {
+          throw new Error(`Local server returned code ${response.status}`);
+        }
+      })
+      .catch(() => {
+        chrome.runtime.sendMessage({ event: 'helperState', helperStatus: false });
+      });
   }
 });
