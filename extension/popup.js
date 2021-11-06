@@ -55,6 +55,10 @@ window.onload = () => {
       });
   });
 
+  function retryTweetSong(url) {
+    chrome.runtime.sendMessage({ event: 'retryTweetSong', songUrl: url });
+  }
+
   chrome.runtime.onMessage.addListener((msg) => {
     if (msg.event === 'newSong') { // Detect if a new song is being played
       const { author_name, title, url } = msg.song;
@@ -75,7 +79,14 @@ window.onload = () => {
       listHead.innerHTML = '';
       for (song of msg.songs.reverse().slice(0, 10)) {
         const el = document.createElement('li');
-        el.innerText = `${song.title} by ${song.author_name}`;
+        el.innerText = `${song.title} by ${song.author_name}${song.tweeted ? '' : ' - FAILED'}`;
+        if (!song.tweeted) {
+          const songUrl = song.url;
+          const retryButton = document.createElement('button');
+          retryButton.innerText = '↺';
+          retryButton.addEventListener('click', () => retryTweetSong(songUrl));
+          el.appendChild(retryButton);
+        }
         listHead.appendChild(el);
       }
     }

@@ -10,7 +10,7 @@ console.log('BrutalJukebox started');
 // Make the call to the local server to post a tweet
 function postTweet(song) {
   const tweet = `🎵 Bobby is listening to ${song.title} by ${song.author_name} on ${song.url} 🎵`;
-  console.log('Tweet 🐤 :', tweet);
+  console.log('Posting tweet 🐤 :', tweet);
   fetch('http://localhost:3000/newsong', {
     method: 'POST',
     headers: {
@@ -18,10 +18,20 @@ function postTweet(song) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ tweet }),
-  }).then((response) => response.text()).then((text) => console.log(text));
-
-  tweetedSongs.push(song);
-  chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
+  })
+    .then((response) => response.text())
+    .then((text) => {
+      console.log(`${text} 🐤 : `, tweet);
+      tweetedSongs.push({ ...song, tweeted: true });
+      chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
+    })
+    .catch((error) => {
+      console.error(`Network error while tweeting, check local server
+      \n Tweet 🐤 : ${tweet}
+      \n Error : ${error.message}`);
+      tweetedSongs.push({ ...song, tweeted: false });
+      chrome.runtime.sendMessage({ event: 'tweetSong', songs: tweetedSongs });
+    });
 }
 
 // Determine if an open is ytbMusic and parse it if its a new song
@@ -47,7 +57,12 @@ function mainJukebox(_, changeInfo, tab) {
       fetch(`https://www.youtube.com/oembed?url=${ytURL}&format=json`)
         .then((response) => response.json())
         .then((ytData) => {
-          lastValidSong = { ...ytData, author_name: ytData.author_name.replace(' - Topic', ''), url: ytURL };
+          lastValidSong = {
+            ...ytData,
+            author_name: ytData.author_name.replace(' - Topic', ''),
+            url: ytURL,
+            tweeted: false,
+          };
           chrome.runtime.sendMessage({ event: 'newSong', song: lastValidSong, cancelNextTweet });
         });
     }
@@ -95,5 +110,19 @@ chrome.runtime.onMessage.addListener((msg) => {
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.event === 'cancelTweet') {
     cancelNextTweet = true;
+  }
+});
+
+// Retry tweet
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.event === 'retryTweetSong') {
+    console.log(msg);
+    console.log([...tweetedSongs]);
+    const retrySong = tweetedSongs.splice(
+      tweetedSongs.findIndex((song) => song.url === msg.songUrl),
+      1,
+    )[0];
+    console.log(retrySong, [...tweetedSongs]);
+    postTweet(retrySong);
   }
 });

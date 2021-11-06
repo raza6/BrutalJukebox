@@ -14,20 +14,28 @@ const twit = new Twit(twitcredjson);
 app.post('/newsong', (req, res) => {
   twit.post('statuses/update', { status: req.body.tweet }, (err) => {
     if (err) {
-      console.log('Tweet failed ❌');
+      console.log(`Tweet failed ❌ (${req.body.tweet.slice(25, 50)}...)`);
       res.send('Tweet failed with', req.body.tweet);
     } else {
-      console.log('Tweet success ✔');
+      console.log(`Tweet success ✔ (${req.body.tweet.slice(25, 50)}...)`);
       res.send('Tweet success');
     }
   });
 });
 
 // GET /ping -> return true if local server is alive
-app.get('/ping', (req, res) => {
+app.get('/ping', (_, res) => {
   res.json(true);
 });
 
 app.listen(3000, () => {
   console.log('Server running on port 3000');
+
+  twit.get('account/verify_credentials', { skip_status: true })
+    .catch((err) => {
+      console.error('Connection to twitter.com failed. Check your credentials.', err.stack);
+    })
+    .then((result) => {
+      console.log(`Connected successfully to twitter account @${result.data.screen_name}`);
+    });
 });
