@@ -95,8 +95,12 @@ input:checked + .slider:before {
 	overflow: hidden;
 }
 
-#cancelTweet {
+button {
 	cursor: pointer;
+}
+
+button[disabled] {
+    cursor: default;
 }
 
 #sessionTweet button {
@@ -105,5 +109,4 @@ input:checked + .slider:before {
     width: 20px;
     height: 20px;
     margin-left: 5px;
-    cursor: pointer;
 }

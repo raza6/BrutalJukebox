@@ -29,13 +29,14 @@ window.onload = () => {
   });
 
   const cancelButton = document.getElementById('cancelTweet');
+  const tweetNowButton = document.getElementById('tweetNow');
   cancelButton.addEventListener('click', () => {
     chrome.runtime.sendMessage({ event: 'cancelTweet' });
     cancelButton.innerText = 'Cancelled';
     cancelButton.setAttribute('disabled', 'disabled');
+    tweetNowButton.setAttribute('disabled', 'disabled');
   });
 
-  const tweetNowButton = document.getElementById('tweetNow');
   tweetNowButton.addEventListener('click', () => {
     chrome.runtime.sendMessage({ event: 'tweetNow' });
   });
@@ -77,16 +78,24 @@ window.onload = () => {
       document.getElementById('currentSongChannel').innerText = author_name;
       document.getElementById('currentSongLink').innerText = url;
       document.getElementById('currentSongLink').href = url;
+      cancelButton.removeAttribute('hidden');
+      tweetNowButton.removeAttribute('hidden');
       if (msg.cancelNextTweet) {
         cancelButton.innerText = 'Cancelled';
         cancelButton.setAttribute('disabled', 'disabled');
+        tweetNowButton.setAttribute('disabled', 'disabled');
       } else {
         cancelButton.innerText = 'Cancel';
         cancelButton.removeAttribute('disabled');
+        tweetNowButton.removeAttribute('disabled');
       }
     } else if (msg.event === 'tweetSong') { // Detect if song have been tweeted
       const listHead = document.getElementById('sessionTweet');
       listHead.innerHTML = '';
+      if (msg.tweetNow) {
+        cancelButton.setAttribute('disabled', 'disabled');
+        tweetNowButton.setAttribute('disabled', 'disabled');
+      }
       for (song of msg.songs.reverse().slice(0, 10)) {
         const el = document.createElement('li');
         el.innerText = `${song.title} by ${song.author_name}${song.tweeted ? '' : ' - FAILED'}`;
